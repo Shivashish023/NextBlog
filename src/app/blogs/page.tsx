@@ -4,7 +4,7 @@ import React from 'react';
 import BlogCard from '@/components/blogcard/page'; 
 import axios from 'axios';
 import Link from 'next/link';
-
+import { useRouter } from 'next/navigation';
 
 interface Blog {
     _id: string;
@@ -14,6 +14,7 @@ interface Blog {
 }
 
 const Page: React.FC = () => {
+    const router=useRouter();
     const [blogs, setBlogs] = useState<Blog[]>([]);
     const [error, setError] = useState("");
    
@@ -38,6 +39,7 @@ const Page: React.FC = () => {
                 await axios.delete(`/api/deleteroute/${id}`);
                 setBlogs(blogs.filter(blog => blog._id !== id)); 
                 alert("Blog post deleted successfully.");
+                router.push("/blogs");
             } catch (error) {
                 console.error("Error deleting blog:", error);
                 alert("Failed to delete the blog post.");
