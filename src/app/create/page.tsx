@@ -1,34 +1,39 @@
-"use client"; 
-import React, { useState, useEffect } from 'react';
-import axios from 'axios'; 
-import { Button } from '@/components/ui/button'; 
-import { Card } from '@/components/ui/card';
-import { Textarea } from '@/components/ui/textarea';
+"use client";
+import React, { useState, useEffect } from "react";
+import axios from "axios";
+import { Button } from "@/components/ui/button";
+import { Card } from "@/components/ui/card";
+import { Textarea } from "@/components/ui/textarea";
+import { useUser } from "@clerk/nextjs";
 
 const CreateBlog: React.FC = () => {
-    const [title, setTitle] = useState('');
-    const [content, setContent] = useState('');
-    const [currentDate, setCurrentDate] = useState('');
+    const { user } = useUser();
+    const [title, setTitle] = useState("");
+    const [content, setContent] = useState("");
+    const [currentDate, setCurrentDate] = useState("");
 
     useEffect(() => {
-       
-        setCurrentDate(new Date().toLocaleDateString('en-US')); 
+        setCurrentDate(new Date().toLocaleDateString("en-US"));
     }, []);
 
     const handlePost = async () => {
+        if (!user) {
+            console.error("User not authenticated");
+            return;
+        }
+
         try {
-            const response = await axios.post('/api/createroute', {
+            const response = await axios.post("/api/createroute", {
                 title,
                 content,
+                clerkId: user.id,
             });
 
-            console.log('Post created:', response.data);
-           
-           
-            setTitle('');
-            setContent('');
+            console.log("Post created:", response.data);
+            setTitle("");
+            setContent("");
         } catch (error) {
-            console.error('Error creating post:', error);
+            console.error("Error creating post:", error);
         }
     };
 
@@ -55,7 +60,7 @@ const CreateBlog: React.FC = () => {
                         onChange={(e) => setContent(e.target.value)}
                         className="mt-1 block w-full border border-gray-300 rounded-md"
                         placeholder="Write your blog content here"
-                        rows={5} 
+                        rows={5}
                     />
                 </div>
 

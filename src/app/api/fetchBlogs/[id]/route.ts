@@ -8,7 +8,7 @@ export async function GET(request: Request, { params }: { params: Promise<{ id: 
     await dbConnect();
 
     try {
-        const blog = await Blog.findById(id); 
+        const blog = await Blog.findById(id).populate("userId","name"); 
         if (!blog) {
             return NextResponse.json({ message: 'Blog not found' }, { status: 404 });
         }
