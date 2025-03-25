@@ -5,7 +5,8 @@ import BlogCard from "@/components/blogcard/page";
 import axios from "axios";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useUser } from "@clerk/nextjs"; // Import Clerk authentication
+import { useUser } from "@clerk/nextjs";
+import Loading from "@/app/loading"; 
 
 interface Blog {
   _id: string;
@@ -17,18 +18,22 @@ interface Blog {
 
 const Page: React.FC = () => {
   const router = useRouter();
-  const { user } = useUser(); // Get logged-in user from Clerk
+  const { user } = useUser();
   const [blogs, setBlogs] = useState<Blog[]>([]);
   const [error, setError] = useState("");
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const fetchBlogs = async () => {
       try {
+        setLoading(true); 
         const response = await axios.get("/api/fetchBlogs");
         setBlogs(response.data);
       } catch (err) {
         setError("Failed to fetch blog posts");
         console.error("Error fetching blogs:", err);
+      } finally {
+        setLoading(false); 
       }
     };
 
@@ -38,7 +43,7 @@ const Page: React.FC = () => {
   const handleDelete = async (id: string) => {
     try {
       await axios.delete(`/api/deleteroute/${id}`, {
-        data: { clerkId: user?.id }, // Pass logged-in user's Clerk ID
+        data: { clerkId: user?.id },
       });
 
       setBlogs(blogs.filter((blog) => blog._id !== id));
@@ -53,7 +58,10 @@ const Page: React.FC = () => {
   return (
     <div className="flex flex-wrap justify-center gap-6">
       {error && <p className="text-red-500">{error}</p>}
-      {blogs.length > 0 ? (
+
+      {loading ? (
+        <Loading />
+      ) : blogs.length > 0 ? (
         blogs.map((blog) => (
           <div key={blog._id}>
             <Link href={`/blogs/${blog._id}`}>

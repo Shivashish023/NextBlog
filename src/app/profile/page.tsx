@@ -5,6 +5,7 @@ import BlogCard from "@/components/blogcard/page";
 import axios from "axios";
 import { useUser } from "@clerk/nextjs";
 import { useRouter } from "next/navigation";
+import Loading from "@/app/loading"; 
 
 interface Blog {
   _id: string;
@@ -19,6 +20,7 @@ const Profile: React.FC = () => {
   const router = useRouter();
   const [blogs, setBlogs] = useState<Blog[]>([]);
   const [error, setError] = useState("");
+  const [loading, setLoading] = useState(true); 
 
   useEffect(() => {
     if (!user) return;
@@ -30,6 +32,8 @@ const Profile: React.FC = () => {
       } catch (err) {
         setError("Failed to fetch your blogs");
         console.error("Error fetching user blogs:", err);
+      } finally {
+        setLoading(false);
       }
     };
 
@@ -49,6 +53,8 @@ const Profile: React.FC = () => {
       alert("Failed to delete the blog.");
     }
   };
+
+  if (loading) return <Loading />; 
 
   return (
     <div className="p-6">
